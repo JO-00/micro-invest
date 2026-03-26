@@ -1,0 +1,12 @@
+FROM python:3.11-slim
+WORKDIR /app
+
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 3. Finally, copy all your code folders (UI, Actors, backend)
+COPY . .
+
+CMD ["uvicorn", "backend.network:app", "--host", "0.0.0.0", "--port", "8000"]

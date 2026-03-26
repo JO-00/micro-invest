@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    networks:
+      - blockchain_network
+
+
+  brain:
+    image : djo007/mini-blockchain:brain
+    build:
+      context: .
+      dockerfile: global_dockerfile
+    container_name: brain_container
+    command: uvicorn backend.network:app --host 0.0.0.0 --port 8000
+    environment:
+      - REDIS_HOST=redis
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    # allow spawning new dynamic containers
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/app  
+    depends_on:
+      - redis
+    networks:
+      - blockchain_network
+  ui:
+    image : djo007/mini-blockchain:ui
+    build:
+      context: .
+      dockerfile: global_dockerfile
+    volumes:
+      - .:/app
+    container_name: ui_container
+    
+    command: streamlit run UI/main_ui.py --server.port 8501 --server.address 0.0.0.0
+    environment:
+      - API_URL=http://brain:8000
+      - PYTHONPATH=/app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - brain
+    networks:
+      - blockchain_network
+
+networks:
+  blockchain_network:
+    name: blockchain_network
+    driver: bridge

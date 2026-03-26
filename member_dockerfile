@@ -1,0 +1,16 @@
+# this is used by every new node created as a container
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir ecdsa requests redis pydantic python-dotenv
+
+# 2. Copy the Shared DNA
+COPY load_config.py .
+
+# 3. Copy the Actors
+COPY Actors/ . 
+
+# 4. Fire it up
+CMD ["python", "run_container.py"]

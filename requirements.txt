@@ -1,0 +1,9 @@
+ecdsa
+requests
+fastapi
+pydantic
+uvicorn
+streamlit
+redis
+python-dotenv
+docker
